@@ -135,7 +135,7 @@ elseif (isset($_SESSION['hide_maint'])) {
 }
 
 //=================================================================== Create Wallboard
-$WALLBOARD = new Wallboard($CONFIG['SCRIPT_PATH'],$CONFIG['PAGE_TITLE']);
+$WALLBOARD = new Wallboard($CONFIG['SCRIPT_PATH'],$CONFIG['DISPLAY']);
 
 //=================================================================== Create Main Content
 if (isset($_REQUEST["action"])) {

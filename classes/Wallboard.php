@@ -2,10 +2,14 @@
 
 class Wallboard {
 	private $SCRIPT_PATH;
-	private $TITLE;
+	private $TITLE = 'ZbxWallboard';
 	
-	private $TRIGGER_COUNT;
-	private $TRIGGER_COUNT_SHOW;
+	private $PROBLEM_COUNT;
+	private $PROBLEM_COUNT_SHOW = false;
+
+	private $LUNCH_REMINDER = false;
+	private $LUNCH_REMINDER_START = 1200;
+	private $LUNCH_REMINDER_END = 1230;
 	
 	private $MENU = '';
 	private $MAIN_CONTENT = '';
@@ -13,9 +17,23 @@ class Wallboard {
 	private $AJAX_REQUEST = False;
 	private $AJAX_OUTPUT = '';
 	
-	public function __construct($SCRIPT_PATH = '', $TITLE = 'ZbxWallboard') {
+	public function __construct($SCRIPT_PATH = '', $DISPLAY = array()) {
 		$this->SCRIPT_PATH = $SCRIPT_PATH;
-		$this->TITLE = $TITLE;
+		
+		if (isset($DISPLAY['TITLE']))
+			$this->TITLE = $DISPLAY['TITLE'];
+	
+		if (isset($DISPLAY['PROBLEM_COUNT_SHOW']))
+			$this->PROBLEM_COUNT_SHOW = $DISPLAY['PROBLEM_COUNT_SHOW'];
+		
+		if (isset($DISPLAY['LUNCH_REMINDER']))
+			$this->LUNCH_REMINDER = $DISPLAY['LUNCH_REMINDER'];
+
+		if (isset($DISPLAY['LUNCH_REMINDER_START']))
+			$this->LUNCH_REMINDER_START = $DISPLAY['LUNCH_REMINDER_START'];
+
+		if (isset($DISPLAY['LUNCH_REMINDER_END']))
+			$this->LUNCH_REMINDER_END = $DISPLAY['LUNCH_REMINDER_END'];
 	}
 	
 	private function get_severity_color($SEVERITY) {
@@ -138,101 +156,9 @@ class Wallboard {
 		return $BODY;
 	}
 	
-	private function gen_html_table($TRIGGERS) {
-		$OUTPUT_LEFT = '';
-		$OUTPUT_RIGHT = '';
-		$DO_RIGHT = False;
-
-		for ($TRIGGER_CT = 0; $TRIGGER_CT < $this->TRIGGER_COUNT_SHOW; $TRIGGER_CT++) {
-			$TRIGGER = $TRIGGERS[$TRIGGER_CT];
-			if ($TRIGGER) {
-				$MAINTENANCE = False;
-				$ACKNOWLEDGED = False;
-
-				if (array_search('1',array_column($TRIGGER['hosts'], 'maintenance_status')) !== False) {
-					$MAINTENANCE = True;
-				}
-				if (isset($TRIGGER['lastEvent']['acknowledged'])) {
-					if ($TRIGGER['lastEvent']['acknowledged'] === '1') {
-						$ACKNOWLEDGED = True;
-					}
-				}
-
-				if (($MAINTENANCE) | ($ACKNOWLEDGED)) {
-					$COLOR = '';
-				}
-				else {
-					$COLOR = $this->get_severity_color($TRIGGER['priority']);
-				}
-
-				if (isset($TRIGGER['lastEvent']['eventid'])) {
-					$ONCLICK = "onclick='showDialogDetails(\"#dialog_details\",\"" . $TRIGGER['lastEvent']['eventid'] . "\");'";
-				}
-				else {
-					$ONCLICK = '';
-				}
-				
-				$ICONS = False;
-				if ($MAINTENANCE) {
-					$ICONS .= '<span class="mif-wrench"></span>';
-				}
-				if (($MAINTENANCE) & ($ACKNOWLEDGED)) {
-					$ICONS .= ' | ';
-				}
-				if ($ACKNOWLEDGED) {
-					$ICONS .= '<span class="mif-checkmark"></span>';
-				}
-				
-				if ($DO_RIGHT) {
-					$OUTPUT_RIGHT .= '<tr class="' . $COLOR . '" ' . $ONCLICK . '>';
-					$OUTPUT_RIGHT .= '<td class="no-margin" style="padding: 4px; font-size: 0.75em;">' . date('Y-m-d H:i:s ', $TRIGGER['lastchange']) . '</td>';
-					$OUTPUT_RIGHT .= '<td class="no-margin" style="padding: 4px; font-size: 0.75em;">' . $TRIGGER['hostname'] . '</td>';
-					if ($ICONS) {
-						$OUTPUT_RIGHT .= '<td class="no-margin" style="padding: 4px; font-size: 0.75em;">' . $TRIGGER['description'] . '</td>';
-						$OUTPUT_RIGHT .= '<td class="no-margin bg-emerald align-right" style="padding: 4px; font-size: 0.75em;">' . $ICONS . '</td>';
-					}
-					else {
-						$OUTPUT_RIGHT .= '<td class="no-margin" style="padding: 4px; font-size: 0.75em;" colspan="2">' . $TRIGGER['description'] . '</td>';
-					}
-					$OUTPUT_RIGHT .= '</tr>';
-					$DO_RIGHT = False;
-				}
-				else {
-					$OUTPUT_LEFT .= '<tr class="' . $COLOR . '" ' . $ONCLICK . '>';
-					$OUTPUT_LEFT .= '<td class="no-margin" style="padding: 4px; font-size: 0.75em;">' . date('Y-m-d H:i:s ', $TRIGGER['lastchange']) . '</td>';
-					$OUTPUT_LEFT .= '<td class="no-margin" style="padding: 4px; font-size: 0.75em;">' . $TRIGGER['hostname'] . '</td>';
-					if ($ICONS) {
-						$OUTPUT_LEFT .= '<td class="no-margin" style="padding: 4px; font-size: 0.75em;">' . $TRIGGER['description'] . '</td>';
-						$OUTPUT_LEFT .= '<td class="no-margin bg-emerald align-right" style="padding: 4px; font-size: 0.75em;">' . $ICONS . '</td>';
-					}
-					else {
-						$OUTPUT_LEFT .= '<td class="no-margin" style="padding: 4px; font-size: 0.75em;" colspan="2">' . $TRIGGER['description'] . '</td>';
-					}
-					$OUTPUT_LEFT .= '</tr>';
-					$DO_RIGHT = True;
-				}
-			}
-		}
-
-		$OUTPUT = '';
-		$OUTPUT .= '<div class="flex-grid"><div class="row"><div class="cell size-p50 padding10">';
-		$OUTPUT .= '<table class="table striped hovered border bordered">';
-		$OUTPUT .= $OUTPUT_LEFT;
-		$OUTPUT .= '</table></div>';
-		$OUTPUT .= '<div class="cell size-p50 padding10"><table class="table striped hovered border bordered">';
-		$OUTPUT .= $OUTPUT_RIGHT;
-		$OUTPUT .= '</table></div></div></div>';
-
-		$OUTPUT .= '<div data-role="dialog" id="dialog_details" data-close-button="true" data-width="50%" data-height="75%">';
-		$OUTPUT .= '<div class="dialog_details_content" id="dialog_details_content"><h1>Details</h1></div>';
-		$OUTPUT .= '</div>';
-		
-		return $OUTPUT;
-	}
-	
 	private function gen_html_tiles($TRIGGERS) {
 		$OUTPUT = '';
-		for ($TRIGGER_CT = 0; $TRIGGER_CT < $this->TRIGGER_COUNT_SHOW; $TRIGGER_CT++) {
+		for ($TRIGGER_CT = 0; $TRIGGER_CT < $this->PROBLEM_COUNT_SHOW; $TRIGGER_CT++) {
 			$TRIGGER = $TRIGGERS[$TRIGGER_CT];
 			if ($TRIGGER) {
 				$MAINTENANCE = False;
@@ -296,14 +222,15 @@ class Wallboard {
 				$OUTPUT .= '				<div class="content">';
 				$OUTPUT .= '					<p class="align-center text-default">';
 				$OUTPUT .= '										There are no issues in this hostgroup. Good Job!<br />&nbsp;<br />';
-				//Disabled Lunch Reminder
-				//if (intval(date('Hi')) >= 1200 and intval(date('Hi')) <= 1230) {
-				if (FALSE) {
-					$OUTPUT .= '											<span class="mif-spoon-fork mif-ani-flash fg-emerald" style="font-size: 30em;"></span>';
-//					$OUTPUT .= '						<p class="align-center fg-red" style="font-size: 5em;">Heute 15 Minuten sp&auml;ter!</p>';
+
+				/* Lunch Reminder :D */
+				if ($this->LUNCH_REMINDER 
+					and intval(date('Hi')) >= $this->LUNCH_REMINDER_START 
+					and intval(date('Hi')) <= $this->LUNCH_REMINDER_END) {
+						$OUTPUT .= '											<span class="mif-spoon-fork mif-ani-flash fg-emerald" style="font-size: 30em;"></span>';
 				}
 				else {
-					$OUTPUT .= '										<span class="mif-thumbs-up fg-emerald" style="font-size: 30em;"></span>';
+					$OUTPUT .= '											<span class="mif-thumbs-up fg-emerald" style="font-size: 30em;"></span>';
 				}
 				$OUTPUT .= '									</p>';
 				$OUTPUT .= '				</div>';
@@ -523,7 +450,7 @@ class Wallboard {
 
 		//=================================================================== Right: Trigger Counter
 		$MENU .= "<div class='app-bar-element place-right'>
-					<span class='app-bar-element'>Triggers: " . $this->TRIGGER_COUNT_SHOW . " / " . $this->TRIGGER_COUNT . "</span>
+					<span class='app-bar-element'>Triggers: " . $this->PROBLEM_COUNT_SHOW . " / " . $this->PROBLEM_COUNT . "</span>
 				</div>
 				<span class='app-bar-divider place-right'></span>";
 
@@ -534,24 +461,11 @@ class Wallboard {
 	}
 	
 	public function gen_main_content($TRIGGERS) {
-		$this->TRIGGER_COUNT = count($TRIGGERS);
-
-// Added Zooming		
-//		if ($this->TRIGGER_COUNT <= 36) {
-		if ($this->TRIGGER_COUNT <= 36000000) {
-			$this->TRIGGER_COUNT_SHOW = $this->TRIGGER_COUNT;
-			$CONTENT = $this->gen_html_tiles($TRIGGERS);
+		$this->PROBLEM_COUNT = count($TRIGGERS);
+		if ($this->PROBLEM_COUNT_SHOW === 0 or $this->PROBLEM_COUNT_SHOW > $this->PROBLEM_COUNT) {
+			$this->PROBLEM_COUNT_SHOW = $this->PROBLEM_COUNT;
 		}
-		elseif ($this->TRIGGER_COUNT <= 86) {
-			$this->TRIGGER_COUNT_SHOW = $this->TRIGGER_COUNT;
-			$CONTENT = $this->gen_html_table($TRIGGERS);
-		}
-		elseif ($this->TRIGGER_COUNT > 86) {
-			$this->TRIGGER_COUNT_SHOW = 86;
-			$CONTENT = $this->gen_html_table($TRIGGERS);
-		}
-		
-		$this->MAIN_CONTENT = $CONTENT;
+		$this->MAIN_CONTENT = $this->gen_html_tiles($TRIGGERS);
 	}
 	
 	public function error($ERROR_CODE,$ERROR_MSG,$ERROR_TRACE) {
