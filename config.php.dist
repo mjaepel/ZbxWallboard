@@ -1,0 +1,58 @@
+<?php
+
+$CONFIG = array(
+//===================================================================== Zabbix Host
+	'ZABBIX' => array(
+		'URL' => 'https://localhost/zabbix/api_jsonrpc.php',
+		'USERNAME' => 'guest',
+		'PASSWORD' => null,
+		'BASIC_AUTH' => 0
+	),
+
+//===================================================================== Zabbix API Parameters
+	'TRIGGER_SEARCH_PARAMS' => array(
+		'output'						=> 'extend',
+		'selectHosts'					=> 'extend',
+		'selectLastEvent'				=> 'extend',
+		'expandData'					=> 'true',
+		'expandDescription'				=> 'true',
+		'min_severity'					=> 0,
+		'groupids'						=> null,
+		'withLastEventUnacknowledged'	=> null,
+		'maintenance'					=> null,
+		'monitored'						=> 'true',
+		'only_true'						=> 'true',
+		'sortfield'						=> 'lastchange',
+		'sortorder'						=> 'DESC'
+	),
+
+	'HOSTGROUP_SEARCH_PARAMS' => array(
+		'with_monitored_triggers'		=> 'extend',
+		'sortfield'						=> 'name',
+		'sortorder'						=> 'ASC'
+	),
+
+	'EVENT_SEARCH_PARAMS' => array(
+		'eventids'						=> null,
+		'output'						=> 'extend',
+		'select_acknowledges'			=> 'extend'
+	),
+
+//===================================================================== Severity Definition
+	'SEVERITIES' => array (
+		0	=>	'Not classified',
+		1	=>	'Information',
+		2	=>	'Warning',
+		3	=>	'Average',
+		4	=>	'High',
+		5	=>	'Disaster'
+	),
+
+//===================================================================== Define self path
+	'REVERSE_PROXY_PATH' => '',
+	
+//===================================================================== Define page title
+	'PAGE_TITLE' => 'ZbxWallboard'
+);
+
+?>

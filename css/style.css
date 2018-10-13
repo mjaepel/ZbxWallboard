@@ -1,0 +1,25 @@
+body {
+	overflow:hidden;
+}
+
+.date {
+	font-size: 0.75em;
+}
+
+.dialog_details_content {
+	overflow: auto;
+	width: 100%;
+	height: 100%;
+	padding: 10px;
+}
+
+.dialog_details_content form {
+	margin-top: 40px;
+}
+
+.text-shadow {
+/*	text-shadow: 0 0 0.5em #000000, 0 0 0.5em #000000, 0 0 0.5em #000000;
+	text-shadow: -5px 0 black, 0 5px black, 5px 0 black, 0 -5px black; */
+	-webkit-font-smoothing: antialiased;
+	font-smoothing: antialiased;
+}
