@@ -18,10 +18,10 @@ Use big screen in the office and load the wallboard there. All people in the off
 # Installation
 * Download
 * Unpack
-* rename conifg.php.example to config.php
+* rename config.php.example to config.php
 * modify API credentials in config.php and maybe some other things. :)
 
-# Know Issues
+# Known Issues
 * Acknowledge adding is prepared for Zabbix 4.x
 ** not working with Zabbix < v4.0 any more
 ** works only for first message with ack-flag
