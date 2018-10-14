@@ -21,10 +21,16 @@ Use big screen in the office and load the wallboard there. All people in the off
 * rename config.php.example to config.php
 * modify API credentials in config.php and maybe some other things. :)
 
+# Zabbix feature request
+* I created a official feature request:
+  * https://support.zabbix.com/browse/ZBXNEXT-4808
+* The _Monitoring -> Problems_ view have the same features (some of them much better than in ZbxWallboard). The only missing thing is the display format. :(
+  * (and the lunch reminder :D)
+
 # Known Issues
 * Acknowledge adding is prepared for Zabbix 4.x
-** not working with Zabbix < v4.0 any more
-** works only for first message with ack-flag
+  * not working with Zabbix < v4.0 any more
+  * works only for first message with ack-flag
 
 # Additional Screenshots
 ![](docs/Screenshots/ZbxWallboard_LunchReminder.png)
