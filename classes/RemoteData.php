@@ -41,7 +41,7 @@ class RemoteData {
 	}
 	
 	public function add_acknowledge($EVENTID,$MESSAGE) {
-		$this->api_query('event.acknowledge',array('eventids' => $EVENTID, 'message' => $MESSAGE, 'action' => 2));
+		$this->api_query('event.acknowledge',array('eventids' => $EVENTID, 'message' => $MESSAGE, 'action' => 6));
 	}
 	
 	private function api_fetch_array($METHOD, $PARAMS) {
