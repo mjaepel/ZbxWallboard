@@ -6,6 +6,7 @@ class RemoteData {
 	protected $PASSWORD;
 	protected $BASIC_AUTH;
 	protected $AUTH_HASH;
+	protected $ZBX_VERSION;
 	
 	public function __construct($URL,$USERNAME,$PASSWORD,$BASIC_AUTH) {
 		$this->URL = $URL;
@@ -18,6 +19,7 @@ class RemoteData {
 		}
 		else {
 			$this->AUTH_HASH = $this->api_query('user.login', array('password' => $this->PASSWORD, 'user' => $this->USERNAME));
+			$this->ZBX_VERSION = $this->get_zbx_version();
 		}
 	}
 	
@@ -41,7 +43,16 @@ class RemoteData {
 	}
 	
 	public function add_acknowledge($EVENTID,$MESSAGE) {
-		$this->api_query('event.acknowledge',array('eventids' => $EVENTID, 'message' => $MESSAGE, 'action' => 6));
+		if ($this->ZBX_VERSION[0] >= 4) {
+			$this->api_query('event.acknowledge',array('eventids' => $EVENTID, 'message' => $MESSAGE, 'action' => 6));
+		}
+		else {
+			$this->api_query('event.acknowledge',array('eventids' => $EVENTID, 'message' => $MESSAGE));
+		}
+	}
+	
+	public function get_zbx_version() {
+		return explode(".",$this->api_query('apiinfo.version',array()));
 	}
 	
 	private function api_fetch_array($METHOD, $PARAMS) {
@@ -56,18 +67,33 @@ class RemoteData {
 		if ($this->AUTH_HASH == NULL && $METHOD != 'user.login')
 			throw new Exception('No active API login',11);
 		
-		$DATA_JSON = $this->api_curl( 
-			$this->URL,
-			json_encode(
-				array(
-					'auth' => $this->AUTH_HASH,
-					'method' => $METHOD,
-					'id' => 1,
-					'params' => $PARAMS,
-					'jsonrpc' => "2.0"
+		if ($METHOD === 'apiinfo.version') {
+			$DATA_JSON = $this->api_curl( 
+				$this->URL,
+				json_encode(
+					array(
+						'method' => $METHOD,
+						'id' => 1,
+						'params' => $PARAMS,
+						'jsonrpc' => "2.0"
+					)
 				)
-			)
-		);
+			);
+		}
+		else {
+			$DATA_JSON = $this->api_curl( 
+				$this->URL,
+				json_encode(
+					array(
+						'auth' => $this->AUTH_HASH,
+						'method' => $METHOD,
+						'id' => 1,
+						'params' => $PARAMS,
+						'jsonrpc' => "2.0"
+					)
+				)
+			);
+		}
 		
 		$DATA = json_decode($DATA_JSON, true);
 
