@@ -308,7 +308,7 @@ class Wallboard {
 			$MENU .= "<a href='' class='dropdown-toggle'>Hostgroups</a>";
 		}
 
-		$MENU .= "<ul class='d-menu' data-role='dropdown'>";
+		$MENU .= "<ul class='d-menu menu-scroll' data-role='dropdown'>";
 		$MENU .= "<li><a href='" . $this->gen_script_path(array('groupid'=>array('all'))) . "'>&nbsp;&nbsp;All</a></li>";
 		$MENU .= "<hr />";
 
