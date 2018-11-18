@@ -116,13 +116,13 @@ class RemoteData {
 		$HEADERS[]  = 'User-Agent: ZbxWallboard';
 
 		$CURL_OPTS = array(
-			CURLOPT_RETURNTRANSFER => true,	 // Allows for the return of a curl handle
-			CURLOPT_TIMEOUT => 30,			  // Maximum number of seconds to allow curl to process the entire request
-			CURLOPT_CONNECTTIMEOUT => 5,		// Maximm number of seconds to establish a connection, shouldn't take 5 seconds
-			CURLOPT_SSL_VERIFYHOST => false,	// Incase we have a fake SSL Cert...
-			CURLOPT_SSL_VERIFYPEER => false,	// Ditto
-			CURLOPT_FOLLOWLOCATION => true,	 // Incase there's a redirect in place (moved zabbix url), follow it automatically
-			CURLOPT_FRESH_CONNECT => true,	  // Ensures we don't use a cached connection or response
+			CURLOPT_RETURNTRANSFER => true,     // Allows for the return of a curl handle
+			CURLOPT_TIMEOUT => 30,              // Maximum number of seconds to allow curl to process the entire request
+			CURLOPT_CONNECTTIMEOUT => 5,        // Maximm number of seconds to establish a connection, shouldn't take 5 seconds
+			CURLOPT_SSL_VERIFYHOST => false,    // Incase we have a fake SSL Cert...
+			CURLOPT_SSL_VERIFYPEER => false,    // Ditto
+			CURLOPT_FOLLOWLOCATION => false,    // Incase there's a redirect in place (moved zabbix url), follow it automatically
+			CURLOPT_FRESH_CONNECT => true,      // Ensures we don't use a cached connection or response
 			CURLOPT_ENCODING => 'gzip',
 			CURLOPT_HTTPHEADER => $HEADERS,
 			CURLOPT_CUSTOMREQUEST => 'POST',
