@@ -39,7 +39,25 @@ class RemoteData {
 	}
 	
 	public function get_eventdetails($PARAMS) {
-		return $this->api_fetch_array('event.get',$PARAMS);
+		$EVENTDETAILS = $this->api_fetch_array('event.get',$PARAMS);
+		foreach ($EVENTDETAILS[0]['acknowledges'] as $ACKED_KEY => $ACKED_FIELD) {
+			if (!isset($EVENTDETAILS[0]['acknowledges'][$ACKED_KEY]['alias'])) {
+				$EVENTDETAILS[0]['acknowledges'][$ACKED_KEY]['name'] = "Inaccessible UserID";
+				$EVENTDETAILS[0]['acknowledges'][$ACKED_KEY]['surname'] = $EVENTDETAILS[0]['acknowledges'][$ACKED_KEY]['userid'];
+			}
+			else {
+				if (!isset($EVENTDETAILS[0]['acknowledges'][$ACKED_KEY]['name'])) {
+					$EVENTDETAILS[0]['acknowledges'][$ACKED_KEY]['name'] = '';
+				}
+				if (!isset($EVENTDETAILS[0]['acknowledges'][$ACKED_KEY]['surname'])) {
+					$EVENTDETAILS[0]['acknowledges'][$ACKED_KEY]['surname'] = '';
+				}
+				if ($EVENTDETAILS[0]['acknowledges'][$ACKED_KEY]['name'] === '' AND $EVENTDETAILS[0]['acknowledges'][$ACKED_KEY]['surname'] === '') {
+					$EVENTDETAILS[0]['acknowledges'][$ACKED_KEY]['name'] = $EVENTDETAILS[0]['acknowledges'][$ACKED_KEY]['alias'];
+				}
+			}
+		}
+		return $EVENTDETAILS;
 	}
 	
 	public function add_acknowledge($EVENTID,$MESSAGE) {
