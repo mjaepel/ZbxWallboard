@@ -1,0 +1,24 @@
+{
+    "manifest_version": 1.0,
+    "id": "ZbxWallboard",
+    "name": "ZbxWallboard",
+    "version": "1.0",
+    "namespace": "ZbxWallboard",
+    "author": "Marcel Jaepel",
+    "url": "https://github.com/zbxwallboard/ZbxWallboard",
+    "description": "Wallboard view of problem overview",
+    "actions": {
+        "zbxwallboard.view": {
+            "class": "ZbxWallboardProblemView",
+            "view": "monitoring.wallboard.view",
+			"layout": "layout.htmlpage"
+        },
+        "zbxwallboard.jsrpc": {
+            "class": "ZbxWallboardProblemView",
+            "view": "monitoring.wallboard.view",
+			"layout": "layout.json"
+        }
+    },
+    "config": {
+    }
+}
