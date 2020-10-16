@@ -28,6 +28,19 @@
 **   - replaced action name "problem.view" by "zbxwallboard.view"
 **/
 
+/*
+** Workaround for reused CControllerProblemView
+** no nice way to add a custom filter option from own classes
+**/
+
+// default
+$tile_scaling = True;
+if (array_key_exists('disable_tile_scaling',$_REQUEST)) {
+	if ($_REQUEST['disable_tile_scaling'] == 1) {
+		$tile_scaling = False;
+	}
+}
+
 $options = [
 	'resourcetype' => SCREEN_RESOURCE_PROBLEM,
 	'mode' => SCREEN_MODE_JS,
@@ -72,7 +85,9 @@ if ($data['action'] === 'zbxwallboard.view') {
 	$this->addJsFile('layout.mode.js');
 
 	$this->includeJsFile('monitoring.wallboard.view.zbx.js.php');
-	$this->includeJsFile('monitoring.wallboard.view.js.php');
+	if ($tile_scaling === True) {
+		$this->includeJsFile('monitoring.wallboard.view.scaling.js.php');
+	}
 
 	$this->enableLayoutModes();
 	$web_layout_mode = $this->getLayoutMode();
@@ -261,8 +276,12 @@ if ($data['action'] === 'zbxwallboard.view') {
 				(new CLabel(_('Show unacknowledged only'), 'filter_unacknowledged'))
 					->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 				(new CCheckBox('filter_unacknowledged'))
-					->setChecked($data['filter']['unacknowledged'] == 1)
+					->setChecked($data['filter']['unacknowledged'] == 1),
 			]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+		])
+		->addRow(_('Disable tile scaling'), [
+			(new CCheckBox('disable_tile_scaling'))
+				->setChecked($tile_scaling == False)
 		]);
 
 	$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'zbxwallboard.view')))
