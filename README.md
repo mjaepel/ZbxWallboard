@@ -14,6 +14,7 @@ Use big screen in the office and load the wallboard there. All people in the off
 
 ### Zabbix UI Module
 > **_NOTE:_**  Only tested with Zabbix 6.0. There are known issues with newer Zabbix releases.
+
 ![](module/docs/Screenshots/ZbxWallboard_module.png)
 
 [Take a look ...](module/README.md)
