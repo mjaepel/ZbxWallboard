@@ -8,7 +8,9 @@
         var initialHeight = parseInt($firstTile.css('height')) + verticalMargin;
         var initialFontSize = parseFloat($firstTile.css('font-size'));
         var initialTextAccentSize = parseFloat($firstTile.find('.text-accent:eq(0)').css('font-size'));
+        var initialTextAccentSmallSize = parseFloat($firstTile.find('.text-accent-small:eq(0)').css('font-size'));
         var initialTextDefaultSize = parseFloat($firstTile.find('.text-default:eq(0)').css('font-size'));
+        var initialTextDefaultSmallSize = parseFloat($firstTile.find('.text-default-small:eq(0)').css('font-size'));
         var aspectRatio = initialWidth / initialHeight;
 
         function adaptTileSizes() {
@@ -47,7 +49,9 @@
             $this.css('height', tileHeight - verticalMargin);
             $this.css('font-size', initialFontSize * scaleFactor);
             $this.find('.text-accent').css('font-size', initialTextAccentSize * scaleFactor);
+            $this.find('.text-accent-small').css('font-size', initialTextAccentSmallSize * scaleFactor);
             $this.find('.text-default').css('font-size', initialTextDefaultSize * scaleFactor);
+            $this.find('.text-default-small').css('font-size', initialTextDefaultSmallSize * scaleFactor);
         }
 
         $(window).on('resize', adaptTileSizes);

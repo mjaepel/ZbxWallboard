@@ -1,6 +1,6 @@
 <?php
 
-class RemoteData {
+class RemoteData_Zabbix {
 	protected $URL;
 	protected $USERNAME;
 	protected $PASSWORD;
@@ -114,7 +114,6 @@ class RemoteData {
 		}
 		
 		$DATA = json_decode($DATA_JSON, true);
-
 		if (!empty($DATA['result'])) {
 			return $DATA['result'];
 		} 

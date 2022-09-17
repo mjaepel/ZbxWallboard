@@ -8,7 +8,8 @@ session_start();
 
 //=================================================================== Includes
 require_once('config.php');
-require_once('classes/RemoteData.php');
+require_once('classes/RemoteData_Zabbix.php');
+require_once('classes/RemoteData_Icinga.php');
 require_once('classes/Wallboard.php');
 require_once('classes/ExceptionHandler.php');
 
@@ -28,8 +29,17 @@ if (isset($_SESSION["password"])) {
 }
 
 //=================================================================== API Data
-$API = new RemoteData($CONFIG['ZABBIX']['URL'],$CONFIG['ZABBIX']['USERNAME'],$CONFIG['ZABBIX']['PASSWORD'],$CONFIG['ZABBIX']['BASIC_AUTH']);
-$HOSTGROUPS = $API->get_hostgroups($CONFIG['HOSTGROUP_SEARCH_PARAMS']);
+if ($CONFIG['ZABBIX']['ENABLED']) {
+	$BACKEND_ZBX = new RemoteData_Zabbix($CONFIG['ZABBIX']['URL'],$CONFIG['ZABBIX']['USERNAME'],$CONFIG['ZABBIX']['PASSWORD'],$CONFIG['ZABBIX']['BASIC_AUTH']);
+	$HOSTGROUPS = $BACKEND_ZBX->get_hostgroups($CONFIG['HOSTGROUP_SEARCH_PARAMS']);
+}
+else {
+	$HOSTGROUPS = array();
+}
+
+if ($CONFIG['ICINGA']['ENABLED']) {
+	$BACKEND_ICINGA = new RemoteData_Icinga($CONFIG['ICINGA']['URL'],$CONFIG['ICINGA']['USERNAME'],$CONFIG['ICINGA']['PASSWORD']);
+}
 
 //=================================================================== Request Hostgroup, Severity and Display Options
 // Hostgroup Filtering
@@ -144,7 +154,7 @@ if (isset($_REQUEST["action"])) {
 			if (isset($_REQUEST["eventid"])) {
 				if (is_numeric($_REQUEST["eventid"])) {
 					$CONFIG['EVENT_SEARCH_PARAMS']['eventids'] = $_REQUEST["eventid"];
-					$DETAILS = $API->get_eventdetails($CONFIG['EVENT_SEARCH_PARAMS']);
+					$DETAILS = $BACKEND_ZBX->get_eventdetails($CONFIG['EVENT_SEARCH_PARAMS']);
 					$WALLBOARD->ajax_event_details($DETAILS);
 				}
 			}
@@ -154,7 +164,7 @@ if (isset($_REQUEST["action"])) {
 				if (isset($_REQUEST["ack_msg"])) {
 					if (is_numeric($_REQUEST["eventid"]) && (is_string($_REQUEST["ack_msg"]))) {
 						if (isset($_SESSION["username"])) {
-							$API->add_acknowledge($_REQUEST["eventid"],$_REQUEST["ack_msg"]);
+							$BACKEND_ZBX->add_acknowledge($_REQUEST["eventid"],$_REQUEST["ack_msg"]);
 							header('Location: ' . $WALLBOARD->gen_script_path());
 							exit;
 						}
@@ -189,7 +199,23 @@ if (isset($_REQUEST["action"])) {
 	}
 }
 else {
-	$TRIGGERS = $API->get_triggers($CONFIG['TRIGGER_SEARCH_PARAMS']);
+	$TRIGGERS_ZBX = array();
+	$TRIGGERS_ICINGA = array();
+
+	if ($CONFIG['ZABBIX']['ENABLED']) {
+		$TRIGGERS_ZBX = $BACKEND_ZBX->get_triggers($CONFIG['TRIGGER_SEARCH_PARAMS']);
+		if (count($TRIGGERS_ZBX) === 1) {
+			if ($TRIGGERS_ZBX[0] === false) {
+				$TRIGGERS_ZBX = array();
+			}
+		}
+	}
+
+	if ($CONFIG['ICINGA']['ENABLED']) {
+		$TRIGGERS_ICINGA = $BACKEND_ICINGA->get_triggers($CONFIG['ICINGA_SEARCH_PARAMS']);
+	}
+
+	$TRIGGERS = array_merge($TRIGGERS_ZBX, $TRIGGERS_ICINGA);
 	$WALLBOARD->gen_main_content($TRIGGERS);
 }
 

@@ -158,9 +158,9 @@ class Wallboard {
 	
 	private function gen_html_tiles($TRIGGERS) {
 		$OUTPUT = '';
-		for ($TRIGGER_CT = 0; $TRIGGER_CT < $this->PROBLEM_COUNT_SHOW; $TRIGGER_CT++) {
-			$TRIGGER = $TRIGGERS[$TRIGGER_CT];
-			if ($TRIGGER) {
+		if ($TRIGGERS) {
+			for ($TRIGGER_CT = 0; $TRIGGER_CT < $this->PROBLEM_COUNT_SHOW; $TRIGGER_CT++) {
+				$TRIGGER = $TRIGGERS[$TRIGGER_CT];
 				$MAINTENANCE = False;
 				$ACKNOWLEDGED = False;
 
@@ -190,55 +190,87 @@ class Wallboard {
 				$OUTPUT .= '<div class="tile-wide ' . $COLOR . ' no-margin-right shadow" data-role="tile" ' . $ONCLICK . '>';
 				$OUTPUT .= '<div class="tile-content">';
 				$OUTPUT .= '<p class="align-center text-default">' . date('Y-m-d H:i:s ', $TRIGGER['lastchange']) . '</p>';
-				$OUTPUT .= '<p class="align-center text-accent">' . str_pad($TRIGGER['hosts'][0]['name'],32) . '</p>';
-				$OUTPUT .= '<p class="align-center text-default">' . $TRIGGER['description'] . '</p>';
 
-				if (($MAINTENANCE) | ($ACKNOWLEDGED)) {
+				$HOSTNAME = $TRIGGER['hosts'][0]['name'];
+				if (strlen($TRIGGER['hosts'][0]['name']) > 32) {
+					$OUTPUT .= '<p class="align-center text-accent-small">' . $HOSTNAME . '</p>';
+					$OUTPUT .= '<p class="align-center text-accent hidden">' . $HOSTNAME . '</p>';
+				}
+				else {
+					$OUTPUT .= '<p class="align-center text-accent-small hidden">' . $HOSTNAME . '</p>';
+					$OUTPUT .= '<p class="align-center text-accent">' . $HOSTNAME . '</p>';
+				}
+
+				if (strlen($TRIGGER['description']) > 64) {
+					$OUTPUT .= '<p class="align-center text-default-small">' . $TRIGGER['description'] . '</p>';
+					$OUTPUT .= '<p class="align-center text-default hidden">' . $TRIGGER['description'] . '</p>';
+				}
+				else {
+					$OUTPUT .= '<p class="align-center text-default-small hidden">' . $TRIGGER['description'] . '</p>';
+					$OUTPUT .= '<p class="align-center text-default">' . $TRIGGER['description'] . '</p>';
+				}
+
+				
+				$BADGES = array();
+				if (array_key_exists('backend_icinga', $TRIGGER)) {
+					$BADGES[] = '<span>Icinga</span>';
+				}
+				else {
+					// we know the default backend :)
+					// $BADGES[] = '<span>Zabbix</span>';
+				}
+				
+				if ($MAINTENANCE) {
+					$BADGES[] = '<span class="mif-wrench"></span>';
+				}
+				
+				if ($ACKNOWLEDGED) {
+					$BADGES[] = '<span class="mif-checkmark"></span>';
+				}
+				
+				if (count($BADGES) > 0) {
 					$OUTPUT .= '<span class="tile-badge bg-emerald">';
-					if ($MAINTENANCE) {
-						$OUTPUT .= '<span class="mif-wrench"></span>';
-					}
-					if (($MAINTENANCE) & ($ACKNOWLEDGED)) {
-						$OUTPUT .= ' | ';
-					}
-					if ($ACKNOWLEDGED) {
-						$OUTPUT .= '<span class="mif-checkmark"></span>';
+					for ($BADGE_ID = 0; $BADGE_ID < count($BADGES); $BADGE_ID++) {
+						$OUTPUT .= $BADGES[$BADGE_ID];
+						if ($BADGE_ID != count($BADGES)-1) {
+							$OUTPUT .= ' | ';
+						}
 					}
 					$OUTPUT .= '</span>';
 				}
 
 				$OUTPUT .= '</div></div>';
-
-			}
-			else {
-				$OUTPUT .= '<div class="row flex-just-center">&nbsp;</div>';
-				$OUTPUT .= '	<div class="row flex-just-center">';
-				$OUTPUT .= '		<div class="cell"></div>';
-				$OUTPUT .= '			<div class="panel success">';
-				$OUTPUT .= '				<div class="heading">';
-				$OUTPUT .= '					<span class="icon mif-thumbs-up"></span>';
-				$OUTPUT .= '					<span class="title">No issues!</span>';
-				$OUTPUT .= '				</div>';
-				$OUTPUT .= '				<div class="content">';
-				$OUTPUT .= '					<p class="align-center text-default">';
-				$OUTPUT .= '										There are no issues in this hostgroup. Good Job!<br />&nbsp;<br />';
-
-				/* Lunch Reminder :D */
-				if ($this->LUNCH_REMINDER 
-					and intval(date('Hi')) >= $this->LUNCH_REMINDER_START 
-					and intval(date('Hi')) <= $this->LUNCH_REMINDER_END) {
-						$OUTPUT .= '											<span class="mif-spoon-fork mif-ani-flash fg-emerald" style="font-size: 30em;"></span>';
-				}
-				else {
-					$OUTPUT .= '											<span class="mif-thumbs-up fg-emerald" style="font-size: 30em;"></span>';
-				}
-				$OUTPUT .= '									</p>';
-				$OUTPUT .= '				</div>';
-				$OUTPUT .= '			</div>';
-				$OUTPUT .= '		</div>';
-				$OUTPUT .= '</div>';
 			}
 		}
+		else {
+			$OUTPUT .= '<div class="row flex-just-center">&nbsp;</div>';
+			$OUTPUT .= '	<div class="row flex-just-center">';
+			$OUTPUT .= '		<div class="cell"></div>';
+			$OUTPUT .= '			<div class="panel success">';
+			$OUTPUT .= '				<div class="heading">';
+			$OUTPUT .= '					<span class="icon mif-thumbs-up"></span>';
+			$OUTPUT .= '					<span class="title">No issues!</span>';
+			$OUTPUT .= '				</div>';
+			$OUTPUT .= '				<div class="content">';
+			$OUTPUT .= '					<p class="align-center text-default">';
+			$OUTPUT .= '										There are no issues in this hostgroup. Good Job!<br />&nbsp;<br />';
+
+			/* Lunch Reminder :D */
+			if ($this->LUNCH_REMINDER 
+				and intval(date('Hi')) >= $this->LUNCH_REMINDER_START 
+				and intval(date('Hi')) <= $this->LUNCH_REMINDER_END) {
+					$OUTPUT .= '											<span class="mif-spoon-fork mif-ani-flash fg-emerald" style="font-size: 30em;"></span>';
+			}
+			else {
+				$OUTPUT .= '											<span class="mif-thumbs-up fg-emerald" style="font-size: 30em;"></span>';
+			}
+			$OUTPUT .= '									</p>';
+			$OUTPUT .= '				</div>';
+			$OUTPUT .= '			</div>';
+			$OUTPUT .= '		</div>';
+			$OUTPUT .= '</div>';
+		}
+
 
 		$OUTPUT .= '<div data-role="dialog" id="dialog_details" data-close-button="true" data-width="50%" data-height="75%">';
 		$OUTPUT .= '<div class="dialog_details_content" id="dialog_details_content"><h1>Details</h1></div>';

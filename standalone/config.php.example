@@ -31,6 +31,27 @@ $CONFIG = array(
 		'BASIC_AUTH' => 0
 	),
 
+//===================================================================== Icinga API credentials
+	'ICINGA' => array(
+		/* Full URL to IcingaWeb2 */
+		'URL' => 'https://localhost/icingaweb2/',
+		
+		/* User which should be used for api connection */
+		'USERNAME' => 'guest',
+		
+		/* 
+			Password for api user.
+			Type: string
+		*/
+		'PASSWORD' => '',
+		
+		/* 
+			Enables Icinga Backend.
+			Type: bool
+		*/
+		'ENABLED' => false
+	),
+
 //===================================================================== Reverse Proxy
 	/*
 		Special setting for usage behind reverse proxys and different url-paths
@@ -118,6 +139,17 @@ $CONFIG = array(
 		5	=>	'Disaster'
 	)
 
+//===================================================================== Icinga API search parameters
+	/* 
+		Defines the search parameters for Icinga Web Filter.
+		Set it to empty string if you dont want to filter.
+
+		See url params as search filters in https://icinga.com/blog/2021/01/27/creating-dashboards-based-on-custom-filters/
+	*/
+	'ICINGA_SEARCH_PARAMS' => array(
+		'SERVICES' => '_host_customer_number=123456',
+		'HOSTS' => 'host=my.nice.fqdn.tld'
+	)
 );
 
 ?>
