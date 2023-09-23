@@ -139,7 +139,7 @@ class Wallboard {
 					<link href='css/metro-schemes.min.css' rel='stylesheet'>
 					<link href='css/style.css' rel='stylesheet'>
 
-					<script src='js/jquery-3.3.1.min.js'></script>
+					<script src='js/jquery-3.7.1.min.js'></script>
 					<script src='js/metro.min.js'></script>
 					<script src='js/wallboard.js'></script>
 					<script src='js/scale.js'></script>

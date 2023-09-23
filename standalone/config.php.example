@@ -114,7 +114,7 @@ $CONFIG = array(
 	),
 
 	'HOSTGROUP_SEARCH_PARAMS' => array(
-		'with_monitored_triggers'		=> 'extend',
+		'with_monitored_triggers'		=> true,
 		'sortfield'						=> 'name',
 		'sortorder'						=> 'ASC'
 	),

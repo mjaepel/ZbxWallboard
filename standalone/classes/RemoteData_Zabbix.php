@@ -18,7 +18,7 @@ class RemoteData_Zabbix {
 			$this->AUTH_HASH = $_SESSION['AUTH_HASH'];
 		}
 		else {
-			$this->AUTH_HASH = $this->api_query('user.login', array('password' => $this->PASSWORD, 'user' => $this->USERNAME));
+			$this->AUTH_HASH = $this->api_query('user.login', array('password' => $this->PASSWORD, 'username' => $this->USERNAME));
 			$this->ZBX_VERSION = $this->get_zbx_version();
 		}
 	}
